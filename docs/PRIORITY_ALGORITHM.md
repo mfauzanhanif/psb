@@ -19,12 +19,12 @@ flowchart TD
 
     subgraph DIRECT["⚡ PEMBAYARAN LANGSUNG"]
         subgraph MADRASAH_DIRECT["📿 MADRASAH"]
-            E["Bendahara Unit Madrasah"]
+            E["Bendahara Madrasah"]
             E1["Lunas/mengurangi tagihan Madrasah"]
         end
         
         subgraph SEKOLAH_DIRECT["🏫 SEKOLAH"]
-            H["Bendahara Unit SMP/MA"]
+            H["Bendahara Sekolah SMP/MA"]
             H1["Lunas/mengurangi tagihan Sekolah"]
         end
     end
@@ -34,8 +34,8 @@ flowchart TD
         B1["Hitung SISA TAGIHAN<br/>(setelah pembayaran langsung)"]
         
         subgraph PRIORITY1["🥇 PRIORITAS 1: MADRASAH"]
-            C{"Sisa Tagihan<br/>Madrasah > 0?"}
-            C1{"Cek sisa tagihan<br/>Madrasah"}
+            C["Cek sisa tagihan Madrasah"]
+            C1{"Sisa Tagihan<br/>Madrasah > 0?"}
             C2["Alokasi ke Madrasah<br/>(hingga lunas)"]
         end
         
@@ -44,7 +44,7 @@ flowchart TD
             
             subgraph SEKOLAH_SPLIT["SEKOLAH"]
                 D1["Alokasi 50%"]
-                D2["Cek sisa tagihan<br/>Sekolah"]
+                D2["Cek sisa tagihan Sekolah"]
                 D3{"Melebihi sisa<br/>tagihan Sekolah?"}
                 D4["Terima max sisa tagihan"]
                 D5["Overflow → Pondok"]
@@ -57,26 +57,35 @@ flowchart TD
     end
 
     subgraph OUTPUT["✅ OUTPUT"]
-        N["Total Penerimaan Per Lembaga:<br/>Pembayaran Langsung + Distribusi Panitia"]
+        N["Total Penerimaan Per Lembaga"]
     end
 
+    %% Input routing
     A -->|Madrasah| E
     A -->|Sekolah| H
     A -->|Panitia| B
+
+    %% Direct Madrasah flow
+    E --> E1 --> C
     
-    E --> E1 --> C1 --> C
-    H --> H1 --> D1
+    %% Direct Sekolah flow
+    H --> H1 --> D2
+
+    %% Panitia flow - Priority 1 (Madrasah)
+    B --> B1 --> C
+    C --> C1
+    C1 -->|Ya| C2
+    C2 --> C1
+    C1 -->|Tidak/Lunas| D
     
-    B --> B1 --> C1 --> C
-    C -->|Ya| C2 --> D1
-    C -->|Tidak/Lunas| D
-    
+    %% Priority 2 (50:50 Split)
     D --> D1
     D1 --> D2
-    D2 -->|Ya| D3 --> D4
-    D2 -->|Tidak| N
-    D4 --> D5
+    D2 --> D3
+    D3 -->|Ya| D4 --> D5
+    D3 -->|Tidak| N
     D5 --> D6
+    D --> D6
     D6 --> N
 
     style INPUT fill:#f5f5f5,stroke:#9e9e9e
