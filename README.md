@@ -1,59 +1,295 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Penerimaan Santri Baru (PSB)
+## Pondok Pesantren Dar Al Tauhid
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi berbasis web untuk mengelola pendaftaran santri baru, pembayaran, dan manajemen data santri secara terpusat. Dibangun menggunakan **Laravel 12**, **Filament 4**, dan **Livewire 3**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Pendaftaran Online
+- Wizard pendaftaran step-by-step untuk wali santri
+- Validasi data real-time
+- Nomor pendaftaran otomatis
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Manajemen Keuangan
+- Pelacakan pembayaran per santri
+- Komponen biaya yang dapat dikonfigurasi per lembaga
+- Distribusi dana otomatis ke lembaga terkait
+- Laporan transaksi komprehensif
 
-## Learning Laravel
+### Notifikasi WhatsApp
+- Integrasi dengan [Fonnte](https://fonnte.com) untuk notifikasi otomatis
+- Notifikasi status pendaftaran ke wali santri
+- Notifikasi pembayaran
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Manajemen Dokumen
+- Upload berkas santri (foto, ijazah, akta, dll)
+- Verifikasi dokumen oleh admin
+- Penyimpanan file terorganisir
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Laporan & Ekspor
+- Laporan transaksi keuangan
+- Data santri dalam format Excel
+- Generate kwitansi pembayaran PDF
+- Laporan ringkasan pendaftaran
 
-## Laravel Sponsors
+### Multi-Lembaga
+Mendukung pengelolaan untuk:
+- ✅ Pondok Pesantren
+- ✅ Madrasah Diniyah
+- ✅ SMP Plus Dar Al Tauhid
+- ✅ MA Nusantara
+- ✅ MTsN 3 Cirebon
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🛠️ Prasyarat Sistem
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+| Komponen | Versi Minimum |
+|----------|---------------|
+| PHP | 8.2+ |
+| MySQL/MariaDB | 5.7+ / 10.3+ |
+| Composer | 2.x |
+| Node.js | 18.x+ |
+| NPM | 9.x+ |
 
-## Contributing
+### Ekstensi PHP yang Diperlukan
+- BCMath
+- Ctype
+- DOM
+- Fileinfo
+- JSON
+- Mbstring
+- OpenSSL
+- PDO (MySQL)
+- Tokenizer
+- XML
+- GD / Imagick (untuk QR Code)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🚀 Instalasi Cepat
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 1. Clone Repositori
+```bash
+git clone https://github.com/your-repo/psb.git
+cd psb
+```
 
-## Security Vulnerabilities
+### 2. Install Dependensi
+```bash
+composer install
+npm install
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 3. Konfigurasi Lingkungan
+```bash
+cp .env.example .env
+```
 
-## License
+Edit file `.env` dan sesuaikan:
+```env
+# Database
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=psb
+DB_USERNAME=root
+DB_PASSWORD=your_password
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# WhatsApp Gateway (Fonnte)
+FONNTE_TOKEN=your_fonnte_token
+```
+
+### 4. Generate Application Key
+```bash
+php artisan key:generate
+```
+
+### 5. Migrasi & Seed Database
+```bash
+php artisan migrate:fresh --seed
+```
+> ⚠️ Perintah ini akan membuat ulang database dan mengisi data awal termasuk user admin, lembaga, dan komponen biaya.
+
+### 6. Link Storage
+```bash
+php artisan storage:link
+```
+
+### 7. Build Aset Frontend
+```bash
+npm run build
+```
+
+### 8. Jalankan Server Development
+```bash
+# Menggunakan script composer (recommended)
+composer dev
+
+# Atau secara manual
+php artisan serve
+```
+
+---
+
+## 👤 Akun Default
+
+Setelah menjalankan seeder, akun-akun berikut tersedia:
+
+### Administrator
+| Field | Value |
+|-------|-------|
+| Email | `fauzanhanif2112@gmail.com` |
+| Password | `F@uzan2112` |
+| Role | Administrator (Full Access) |
+
+### Petugas PSB
+| Field | Value |
+|-------|-------|
+| Email | `nabilmaulidi@psb.daraltauhid.com` |
+| Password | `password` |
+| Role | Petugas (Input/Edit Santri) |
+
+### Bendahara
+| Field | Value |
+|-------|-------|
+| Email | `bendahara.pondok@psb.com` |
+| Password | `password` |
+| Role | Bendahara Pondok (Keuangan Global) |
+
+> 📝 Untuk daftar lengkap akun, lihat file `database/seeders/DatabaseSeeder.php`
+
+---
+
+## 🔐 Role & Permission
+
+| Role | Deskripsi | Akses |
+|------|-----------|-------|
+| **Administrator** | Super Admin | Akses penuh ke semua fitur |
+| **Petugas** | Panitia PSB | Kelola data santri (CRUD) |
+| **Bendahara Pondok** | Keuangan Pusat | Transaksi semua lembaga |
+| **Bendahara Unit** | Keuangan Lembaga | Transaksi lembaga sendiri |
+| **Kepala** | Pimpinan Lembaga | Lihat data lembaga (Read Only) |
+
+---
+
+## 🔄 Alur Kerja Utama
+
+### Alur Pendaftaran
+```
+Wali Santri          Sistem              Admin
+     │                  │                  │
+     ├── Isi Formulir ──►                  │
+     │                  │                  │
+     │    ◄── Notif WA ─┤                  │
+     │                  │                  │
+     ├── Bayar ─────────►                  │
+     │                  │                  │
+     │                  ├── Verifikasi ────►
+     │                  │                  │
+     │    ◄── Status ───┤◄─────────────────┤
+     │                  │                  │
+```
+
+### Alur Keuangan
+```
+Transaksi Masuk ──► Validasi ──► Distribusi ke Komponen Biaya ──► Laporan
+```
+
+---
+
+## 📁 Struktur Direktori
+
+```
+psb/
+├── app/
+│   ├── Filament/          # Panel Admin (Filament)
+│   │   ├── Resources/     # CRUD Resources
+│   │   └── Widgets/       # Dashboard Widgets
+│   ├── Livewire/          # Komponen Livewire
+│   │   ├── CheckStatus.php
+│   │   ├── Home.php
+│   │   └── RegistrationWizard.php
+│   └── Models/            # Eloquent Models
+├── database/
+│   ├── migrations/        # Database Migrations
+│   └── seeders/           # Database Seeders
+├── resources/
+│   └── views/             # Blade Templates
+├── routes/
+│   └── web.php            # Web Routes
+└── public/                # Public Assets
+```
+
+---
+
+## 📦 Dependensi Utama
+
+| Package | Kegunaan |
+|---------|----------|
+| `filament/filament` | Admin Panel |
+| `livewire/livewire` | Reactive Components |
+| `barryvdh/laravel-dompdf` | Generate PDF |
+| `maatwebsite/excel` | Export Excel |
+| `spatie/laravel-permission` | Role & Permission |
+| `simplesoftwareio/simple-qrcode` | QR Code Generator |
+| `pusher/pusher-php-server` | Realtime Events |
+
+---
+
+## 🧪 Development
+
+### Menjalankan Server Development
+```bash
+composer dev
+```
+Script ini akan menjalankan:
+- Laravel server (`php artisan serve`)
+- Queue worker (`php artisan queue:listen`)
+- Log viewer (`php artisan pail`)
+- Vite dev server (`npm run dev`)
+
+### Menjalankan Tests
+```bash
+composer test
+```
+
+### Code Style (Laravel Pint)
+```bash
+./vendor/bin/pint
+```
+
+---
+
+## 🌐 Environment Variables
+
+| Variable | Deskripsi | Contoh |
+|----------|-----------|--------|
+| `APP_NAME` | Nama Aplikasi | `PSB` |
+| `APP_URL` | URL Aplikasi | `https://psb.daraltauhid.com` |
+| `DB_*` | Konfigurasi Database | - |
+| `FONNTE_TOKEN` | Token API Fonnte | `your_token` |
+| `PUSHER_*` | Konfigurasi Pusher | - |
+| `MAIL_*` | Konfigurasi SMTP | - |
+
+---
+
+## 📞 Kontak & Dukungan
+
+**Pondok Pesantren Dar Al Tauhid**
+- Website: [daraltauhid.com](https://daraltauhid.com)
+- Email: admin@daraltauhid.com
+
+---
+
+## 📄 Lisensi
+
+**Private/Proprietary** - Pondok Pesantren Dar Al Tauhid
+
+Hak cipta dilindungi. Dilarang menyalin, mendistribusikan, atau memodifikasi tanpa izin tertulis.
+
+---
+
+*Built with ❤️ using Laravel, Filament, and Livewire*
