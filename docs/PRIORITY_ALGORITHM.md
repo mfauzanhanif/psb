@@ -21,13 +21,11 @@ flowchart TD
         subgraph MADRASAH_DIRECT["📿 MADRASAH"]
             E["Bendahara Unit Madrasah"]
             E1["Lunas/mengurangi tagihan Madrasah"]
-            E2{"Cek sisa tagihan<br/>Madrasah"}
         end
         
         subgraph SEKOLAH_DIRECT["🏫 SEKOLAH"]
             H["Bendahara Unit SMP/MA"]
             H1["Lunas/mengurangi tagihan Sekolah"]
-            H2{"Cek sisa tagihan<br/>Sekolah"}
         end
     end
 
@@ -37,7 +35,8 @@ flowchart TD
         
         subgraph PRIORITY1["🥇 PRIORITAS 1: MADRASAH"]
             C{"Sisa Tagihan<br/>Madrasah > 0?"}
-            C1["Alokasi ke Madrasah<br/>(hingga lunas)"]
+            C1{"Cek sisa tagihan<br/>Madrasah"}
+            C2["Alokasi ke Madrasah<br/>(hingga lunas)"]
         end
         
         subgraph PRIORITY2["🥈 PRIORITAS 2: 50:50 SPLIT"]
@@ -45,13 +44,14 @@ flowchart TD
             
             subgraph SEKOLAH_SPLIT["SEKOLAH"]
                 D1["Alokasi 50%"]
-                D2{"Melebihi sisa<br/>tagihan Sekolah?"}
-                D3["Terima max sisa tagihan"]
-                D4["Overflow → Pondok"]
+                D2["Cek sisa tagihan<br/>Sekolah"]
+                D3{"Melebihi sisa<br/>tagihan Sekolah?"}
+                D4["Terima max sisa tagihan"]
+                D5["Overflow → Pondok"]
             end
             
             subgraph PONDOK_SPLIT["PONDOK"]
-                D5["Terima 50% + Overflow"]
+                D6["Terima 50% + Overflow"]
             end
         end
     end
@@ -64,8 +64,8 @@ flowchart TD
     A -->|Sekolah| H
     A -->|Panitia| B
     
-    E --> E1 --> E2 --> C
-    H --> H1 --> H2 --> D2
+    E --> E1 --> C
+    H --> H1 --> D
     
     B --> B1 --> C
     C -->|Ya| C1
@@ -77,8 +77,8 @@ flowchart TD
     D2 -->|Ya| D3 --> D4
     D2 -->|Tidak| N
     D4 --> D5
-    D --> D5
-    D5 --> N
+    D5 --> D6
+    D6 --> N
 
     style INPUT fill:#f5f5f5,stroke:#9e9e9e
     style DIRECT fill:#e8f5e9,stroke:#4caf50
