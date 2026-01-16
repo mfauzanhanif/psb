@@ -201,78 +201,78 @@ Menampilkan:
 ### Models
 | File | Deskripsi |
 |------|-----------|
-| [Bill.php](file:///c:/laragon/www/psb-app/app/Models/Bill.php) | Model tagihan per lembaga per santri |
-| [Transaction.php](file:///c:/laragon/www/psb-app/app/Models/Transaction.php) | Model pembayaran masuk |
-| [FundTransfer.php](file:///c:/laragon/www/psb-app/app/Models/FundTransfer.php) | Model distribusi dana |
-| [Student.php](file:///c:/laragon/www/psb-app/app/Models/Student.php) | Model santri (punya bills, transactions) |
-| [Institution.php](file:///c:/laragon/www/psb-app/app/Models/Institution.php) | Model lembaga (punya bills, fundTransfers) |
-| [FeeComponent.php](file:///c:/laragon/www/psb-app/app/Models/FeeComponent.php) | Model komponen biaya per lembaga |
+| [Bill.php](file:///c:/laragon/www/psb/app/Models/Bill.php) | Model tagihan per lembaga per santri |
+| [Transaction.php](file:///c:/laragon/www/psb/app/Models/Transaction.php) | Model pembayaran masuk |
+| [FundTransfer.php](file:///c:/laragon/www/psb/app/Models/FundTransfer.php) | Model distribusi dana |
+| [Student.php](file:///c:/laragon/www/psb/app/Models/Student.php) | Model santri (punya bills, transactions) |
+| [Institution.php](file:///c:/laragon/www/psb/app/Models/Institution.php) | Model lembaga (punya bills, fundTransfers) |
+| [FeeComponent.php](file:///c:/laragon/www/psb/app/Models/FeeComponent.php) | Model komponen biaya per lembaga |
 
 ### Filament Resources (Admin Panel)
 | File | Deskripsi |
 |------|-----------|
-| [TransactionResource.php](file:///c:/laragon/www/psb-app/app/Filament/Resources/TransactionResource.php) | CRUD Transaksi |
-| [CreateTransaction.php](file:///c:/laragon/www/psb-app/app/Filament/Resources/TransactionResource/Pages/CreateTransaction.php) | Halaman create transaksi (hybrid logic) |
-| [ListTransactions.php](file:///c:/laragon/www/psb-app/app/Filament/Resources/TransactionResource/Pages/ListTransactions.php) | List transaksi + header action |
-| [FundTransferResource.php](file:///c:/laragon/www/psb-app/app/Filament/Resources/FundTransferResource.php) | CRUD Distribusi Dana |
-| [ListFundTransfers.php](file:///c:/laragon/www/psb-app/app/Filament/Resources/FundTransferResource/Pages/ListFundTransfers.php) | List distribusi + buat distribusi baru |
-| [StudentResource.php](file:///c:/laragon/www/psb-app/app/Filament/Resources/StudentResource.php) | Resource santri (termasuk info tagihan) |
-| [FeeComponentResource.php](file:///c:/laragon/www/psb-app/app/Filament/Resources/FeeComponentResource.php) | CRUD komponen biaya |
+| [TransactionResource.php](file:///c:/laragon/www/psb/app/Filament/Resources/TransactionResource.php) | CRUD Transaksi |
+| [CreateTransaction.php](file:///c:/laragon/www/psb/app/Filament/Resources/TransactionResource/Pages/CreateTransaction.php) | Halaman create transaksi (hybrid logic) |
+| [ListTransactions.php](file:///c:/laragon/www/psb/app/Filament/Resources/TransactionResource/Pages/ListTransactions.php) | List transaksi + header action |
+| [FundTransferResource.php](file:///c:/laragon/www/psb/app/Filament/Resources/FundTransferResource.php) | CRUD Distribusi Dana |
+| [ListFundTransfers.php](file:///c:/laragon/www/psb/app/Filament/Resources/FundTransferResource/Pages/ListFundTransfers.php) | List distribusi + buat distribusi baru |
+| [StudentResource.php](file:///c:/laragon/www/psb/app/Filament/Resources/StudentResource.php) | Resource santri (termasuk info tagihan) |
+| [FeeComponentResource.php](file:///c:/laragon/www/psb/app/Filament/Resources/FeeComponentResource.php) | CRUD komponen biaya |
 
 ### Services
 | File | Deskripsi |
 |------|-----------|
-| [PaymentDistributionService.php](file:///c:/laragon/www/psb-app/app/Services/PaymentDistributionService.php) | Priority Algorithm & floating cash calculation |
+| [PaymentDistributionService.php](file:///c:/laragon/www/psb/app/Services/PaymentDistributionService.php) | Priority Algorithm & floating cash calculation |
 
 ### Widgets
 | File | Deskripsi |
 |------|-----------|
-| [FundSummaryWidget.php](file:///c:/laragon/www/psb-app/app/Filament/Widgets/FundSummaryWidget.php) | Widget rekap kas mengendap |
-| [BaseFinanceStatsWidget.php](file:///c:/laragon/www/psb-app/app/Filament/Widgets/BaseFinanceStatsWidget.php) | Base class statistik keuangan |
-| [GlobalFinanceStatsWidget.php](file:///c:/laragon/www/psb-app/app/Filament/Widgets/GlobalFinanceStatsWidget.php) | Statistik keuangan global |
-| [PondokFinanceStatsWidget.php](file:///c:/laragon/www/psb-app/app/Filament/Widgets/PondokFinanceStatsWidget.php) | Statistik keuangan Pondok |
-| [SmpFinanceStatsWidget.php](file:///c:/laragon/www/psb-app/app/Filament/Widgets/SmpFinanceStatsWidget.php) | Statistik keuangan SMP |
-| [MaFinanceStatsWidget.php](file:///c:/laragon/www/psb-app/app/Filament/Widgets/MaFinanceStatsWidget.php) | Statistik keuangan MA |
-| [MadrasahFinanceStatsWidget.php](file:///c:/laragon/www/psb-app/app/Filament/Widgets/MadrasahFinanceStatsWidget.php) | Statistik keuangan Madrasah |
+| [FundSummaryWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/FundSummaryWidget.php) | Widget rekap kas mengendap |
+| [BaseFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/BaseFinanceStatsWidget.php) | Base class statistik keuangan |
+| [GlobalFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/GlobalFinanceStatsWidget.php) | Statistik keuangan global |
+| [PondokFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/PondokFinanceStatsWidget.php) | Statistik keuangan Pondok |
+| [SmpFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/SmpFinanceStatsWidget.php) | Statistik keuangan SMP |
+| [MaFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/MaFinanceStatsWidget.php) | Statistik keuangan MA |
+| [MadrasahFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/MadrasahFinanceStatsWidget.php) | Statistik keuangan Madrasah |
 
 ### Controllers
 | File | Deskripsi |
 |------|-----------|
-| [ReceiptController.php](file:///c:/laragon/www/psb-app/app/Http/Controllers/ReceiptController.php) | Cetak & verifikasi nota transaksi |
-| [TransactionExportController.php](file:///c:/laragon/www/psb-app/app/Http/Controllers/TransactionExportController.php) | Export PDF transaksi |
+| [ReceiptController.php](file:///c:/laragon/www/psb/app/Http/Controllers/ReceiptController.php) | Cetak & verifikasi nota transaksi |
+| [TransactionExportController.php](file:///c:/laragon/www/psb/app/Http/Controllers/TransactionExportController.php) | Export PDF transaksi |
 
 ### Livewire Components
 | File | Deskripsi |
 |------|-----------|
-| [CheckStatus.php](file:///c:/laragon/www/psb-app/app/Livewire/CheckStatus.php) | Cek status pembayaran santri (public) |
-| [RegistrationWizard.php](file:///c:/laragon/www/psb-app/app/Livewire/RegistrationWizard.php) | Wizard pendaftaran (generate bills) |
+| [CheckStatus.php](file:///c:/laragon/www/psb/app/Livewire/CheckStatus.php) | Cek status pembayaran santri (public) |
+| [RegistrationWizard.php](file:///c:/laragon/www/psb/app/Livewire/RegistrationWizard.php) | Wizard pendaftaran (generate bills) |
 
 ### Views (Blade)
 | File | Deskripsi |
 |------|-----------|
-| [check-status.blade.php](file:///c:/laragon/www/psb-app/resources/views/livewire/check-status.blade.php) | UI cek status pembayaran |
-| [transaction.blade.php](file:///c:/laragon/www/psb-app/resources/views/receipts/transaction.blade.php) | Template nota transaksi |
-| [verify.blade.php](file:///c:/laragon/www/psb-app/resources/views/receipts/verify.blade.php) | Halaman verifikasi nota |
-| [header.blade.php](file:///c:/laragon/www/psb-app/resources/views/filament/resources/fund-transfer/header.blade.php) | Widget rekap distribusi dana |
-| [detail-modal.blade.php](file:///c:/laragon/www/psb-app/resources/views/filament/resources/fund-transfer/detail-modal.blade.php) | Modal detail distribusi |
-| [transaction-history.blade.php](file:///c:/laragon/www/psb-app/resources/views/filament/modals/transaction-history.blade.php) | Modal riwayat transaksi |
-| [transactions-pdf.blade.php](file:///c:/laragon/www/psb-app/resources/views/exports/transactions-pdf.blade.php) | Template export PDF transaksi |
+| [check-status.blade.php](file:///c:/laragon/www/psb/resources/views/livewire/check-status.blade.php) | UI cek status pembayaran |
+| [transaction.blade.php](file:///c:/laragon/www/psb/resources/views/receipts/transaction.blade.php) | Template nota transaksi |
+| [verify.blade.php](file:///c:/laragon/www/psb/resources/views/receipts/verify.blade.php) | Halaman verifikasi nota |
+| [header.blade.php](file:///c:/laragon/www/psb/resources/views/filament/resources/fund-transfer/header.blade.php) | Widget rekap distribusi dana |
+| [detail-modal.blade.php](file:///c:/laragon/www/psb/resources/views/filament/resources/fund-transfer/detail-modal.blade.php) | Modal detail distribusi |
+| [transaction-history.blade.php](file:///c:/laragon/www/psb/resources/views/filament/modals/transaction-history.blade.php) | Modal riwayat transaksi |
+| [transactions-pdf.blade.php](file:///c:/laragon/www/psb/resources/views/exports/transactions-pdf.blade.php) | Template export PDF transaksi |
 
 ### Migrations
 | File | Deskripsi |
 |------|-----------|
-| [2025_03_01_000004_create_finance_tables.php](file:///c:/laragon/www/psb-app/database/migrations/2025_03_01_000004_create_finance_tables.php) | Tabel `bills` dan `transactions` |
-| [2026_01_04_000002_create_fund_transfers_table.php](file:///c:/laragon/www/psb-app/database/migrations/2026_01_04_000002_create_fund_transfers_table.php) | Tabel `fund_transfers` |
-| [2026_01_15_000001_add_hybrid_payment_fields.php](file:///c:/laragon/www/psb-app/database/migrations/2026_01_15_000001_add_hybrid_payment_fields.php) | Tambah `payment_location`, `is_settled`, `status` |
-| [2026_01_04_000003_modify_transactions_for_escrow.php](file:///c:/laragon/www/psb-app/database/migrations/2026_01_04_000003_modify_transactions_for_escrow.php) | Modify transactions untuk escrow |
-| [2026_01_04_000004_modify_fund_transfers_for_escrow.php](file:///c:/laragon/www/psb-app/database/migrations/2026_01_04_000004_modify_fund_transfers_for_escrow.php) | Tambah FK student, bill, transaction |
-| [2026_01_03_082540_add_institution_id_to_bills_table.php](file:///c:/laragon/www/psb-app/database/migrations/2026_01_03_082540_add_institution_id_to_bills_table.php) | Tambah institution_id ke bills |
-| [2026_01_03_110819_add_verification_token_to_transactions_table.php](file:///c:/laragon/www/psb-app/database/migrations/2026_01_03_110819_add_verification_token_to_transactions_table.php) | Tambah verification_token |
-| [2026_01_15_000002_increase_verification_token_size.php](file:///c:/laragon/www/psb-app/database/migrations/2026_01_15_000002_increase_verification_token_size.php) | Perbesar verification_token ke 64 char |
+| [2025_03_01_000004_create_finance_tables.php](file:///c:/laragon/www/psb/database/migrations/2025_03_01_000004_create_finance_tables.php) | Tabel `bills` dan `transactions` |
+| [2026_01_04_000002_create_fund_transfers_table.php](file:///c:/laragon/www/psb/database/migrations/2026_01_04_000002_create_fund_transfers_table.php) | Tabel `fund_transfers` |
+| [2026_01_15_000001_add_hybrid_payment_fields.php](file:///c:/laragon/www/psb/database/migrations/2026_01_15_000001_add_hybrid_payment_fields.php) | Tambah `payment_location`, `is_settled`, `status` |
+| [2026_01_04_000003_modify_transactions_for_escrow.php](file:///c:/laragon/www/psb/database/migrations/2026_01_04_000003_modify_transactions_for_escrow.php) | Modify transactions untuk escrow |
+| [2026_01_04_000004_modify_fund_transfers_for_escrow.php](file:///c:/laragon/www/psb/database/migrations/2026_01_04_000004_modify_fund_transfers_for_escrow.php) | Tambah FK student, bill, transaction |
+| [2026_01_03_082540_add_institution_id_to_bills_table.php](file:///c:/laragon/www/psb/database/migrations/2026_01_03_082540_add_institution_id_to_bills_table.php) | Tambah institution_id ke bills |
+| [2026_01_03_110819_add_verification_token_to_transactions_table.php](file:///c:/laragon/www/psb/database/migrations/2026_01_03_110819_add_verification_token_to_transactions_table.php) | Tambah verification_token |
+| [2026_01_15_000002_increase_verification_token_size.php](file:///c:/laragon/www/psb/database/migrations/2026_01_15_000002_increase_verification_token_size.php) | Perbesar verification_token ke 64 char |
 
 ### Observers & Exports
 | File | Deskripsi |
 |------|-----------|
-| [TransactionObserver.php](file:///c:/laragon/www/psb-app/app/Observers/TransactionObserver.php) | Observer untuk transaksi |
-| [FeeComponentObserver.php](file:///c:/laragon/www/psb-app/app/Observers/FeeComponentObserver.php) | Observer untuk update tagihan saat fee berubah |
-| [TransactionsExport.php](file:///c:/laragon/www/psb-app/app/Exports/TransactionsExport.php) | Export Excel transaksi |
+| [TransactionObserver.php](file:///c:/laragon/www/psb/app/Observers/TransactionObserver.php) | Observer untuk transaksi |
+| [FeeComponentObserver.php](file:///c:/laragon/www/psb/app/Observers/FeeComponentObserver.php) | Observer untuk update tagihan saat fee berubah |
+| [TransactionsExport.php](file:///c:/laragon/www/psb/app/Exports/TransactionsExport.php) | Export Excel transaksi |
