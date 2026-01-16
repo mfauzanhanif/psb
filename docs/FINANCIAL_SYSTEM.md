@@ -2,11 +2,13 @@
 
 ## Arsitektur
 
-Sistem keuangan PSB menggunakan **Hybrid Cash Collection & Manual Settlement** yang menggabungkan:
+Sistem keuangan PSB menggunakan **Hybrid Cash Collection & Manual Settlement** yang menggabungkan tiga komponen utama:
 
-1. **Priority Algorithm** - Perhitungan hak dana per lembaga
-2. **Hybrid Cash Collection** - Tracking lokasi uang fisik (Panitia vs Unit)
-3. **Manual Settlement** - Workflow 3 langkah untuk distribusi dana
+| Komponen | Deskripsi | Dokumentasi |
+|----------|-----------|-------------|
+| **Priority Algorithm** | Perhitungan hak dana per lembaga berdasarkan prioritas | [PRIORITY_ALGORITHM.md](file:///c:/laragon/www/psb/docs/PRIORITY_ALGORITHM.md) |
+| **Hybrid Cash Collection** | Tracking lokasi uang fisik (Panitia vs Unit) | [HYBRID_CASH_COLLECTION.md](file:///c:/laragon/www/psb/docs/HYBRID_CASH_COLLECTION.md) |
+| **Manual Settlement** | Workflow 3 langkah untuk distribusi dana | [MANUAL_SETTLEMENT.md](file:///c:/laragon/www/psb/docs/MANUAL_SETTLEMENT.md) |
 
 ---
 
@@ -64,76 +66,6 @@ Record perpindahan dana dari Panitia ke Unit.
 | **status** | enum | PENDING, APPROVED, COMPLETED, REJECTED |
 | approved_at/by | timestamp/FK | Info approval |
 | received_at/by | timestamp/FK | Info penerimaan |
-
----
-
-## Alur Kerja
-
-### A. Input Pembayaran
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     SANTRI BAYAR                                │
-└─────────────────────┬───────────────────────────────────────────┘
-                      │
-           ┌──────────┴──────────┐
-           ▼                     ▼
-    ┌──────────────┐      ┌──────────────┐
-    │   PANITIA    │      │    UNIT      │
-    │ (Admin/BdP)  │      │   (BdU)      │
-    └──────┬───────┘      └──────┬───────┘
-           │                     │
-           ▼                     ▼
-    ┌──────────────┐      ┌──────────────┐
-    │is_settled=0  │      │is_settled=1  │
-    │No FundTransfer│     │Auto COMPLETED│
-    │ "Floating"   │      │ FundTransfer │
-    └──────────────┘      └──────────────┘
-```
-
-### B. Settlement Workflow (3 Langkah)
-
-```
-STEP 1            STEP 2           STEP 3
-┌────────┐       ┌────────┐       ┌─────────┐
-│PENDING │──────▶│APPROVED│──────▶│COMPLETED│
-└────────┘       └────────┘       └─────────┘
- Bendahara        Kepala          Bendahara
-  Pondok                            Unit
-```
-
-1. **PENDING**: Bendahara Pondok membuat request distribusi
-2. **APPROVED**: Kepala menyetujui
-3. **COMPLETED**: Bendahara Unit konfirmasi terima
-
----
-
-## Priority Algorithm
-
-Perhitungan hak dana per lembaga berdasarkan total pembayaran:
-
-```
-Total Bayar Santri
-       │
-       ▼
-┌─────────────────────────────────┐
-│ PRIORITAS 1: MADRASAH (100%)    │
-└─────────────────────────────────┘
-       │ Sisa
-       ▼
-┌─────────────────────────────────┐
-│ 50:50 SEKOLAH & PONDOK          │
-│ • Sekolah max = tagihan sekolah │
-│ • Overflow ke Pondok            │
-└─────────────────────────────────┘
-```
-
-**Contoh:**
-- Bayar: Rp 10.000.000
-- Tagihan Madrasah: Rp 3.000.000 → dapat Rp 3.000.000
-- Sisa Rp 7.000.000 → 50:50
-- Tagihan SMP: Rp 2.000.000 → dapat Rp 2.000.000 (max)
-- Pondok: Rp 3.500.000 + Rp 1.500.000 overflow = Rp 5.000.000
 
 ---
 
