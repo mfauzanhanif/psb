@@ -234,6 +234,7 @@ Menampilkan:
 | [SmpFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/SmpFinanceStatsWidget.php) | Statistik keuangan SMP |
 | [MaFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/MaFinanceStatsWidget.php) | Statistik keuangan MA |
 | [MadrasahFinanceStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/MadrasahFinanceStatsWidget.php) | Statistik keuangan Madrasah |
+| [RegistrationStatsWidget.php](file:///c:/laragon/www/psb/app/Filament/Widgets/RegistrationStatsWidget.php) | Statistik pendaftaran santri |
 
 ### Controllers
 | File | Deskripsi |
@@ -259,16 +260,14 @@ Menampilkan:
 | [transactions-pdf.blade.php](file:///c:/laragon/www/psb/resources/views/exports/transactions-pdf.blade.php) | Template export PDF transaksi |
 
 ### Migrations
+
+> [!NOTE]
+> Migrasi telah dikonsolidasikan menjadi 2 file utama untuk kemudahan maintenance.
+
 | File | Deskripsi |
 |------|-----------|
-| [2025_03_01_000004_create_finance_tables.php](file:///c:/laragon/www/psb/database/migrations/2025_03_01_000004_create_finance_tables.php) | Tabel `bills` dan `transactions` |
-| [2026_01_04_000002_create_fund_transfers_table.php](file:///c:/laragon/www/psb/database/migrations/2026_01_04_000002_create_fund_transfers_table.php) | Tabel `fund_transfers` |
-| [2026_01_15_000001_add_hybrid_payment_fields.php](file:///c:/laragon/www/psb/database/migrations/2026_01_15_000001_add_hybrid_payment_fields.php) | Tambah `payment_location`, `is_settled`, `status` |
-| [2026_01_04_000003_modify_transactions_for_escrow.php](file:///c:/laragon/www/psb/database/migrations/2026_01_04_000003_modify_transactions_for_escrow.php) | Modify transactions untuk escrow |
-| [2026_01_04_000004_modify_fund_transfers_for_escrow.php](file:///c:/laragon/www/psb/database/migrations/2026_01_04_000004_modify_fund_transfers_for_escrow.php) | Tambah FK student, bill, transaction |
-| [2026_01_03_082540_add_institution_id_to_bills_table.php](file:///c:/laragon/www/psb/database/migrations/2026_01_03_082540_add_institution_id_to_bills_table.php) | Tambah institution_id ke bills |
-| [2026_01_03_110819_add_verification_token_to_transactions_table.php](file:///c:/laragon/www/psb/database/migrations/2026_01_03_110819_add_verification_token_to_transactions_table.php) | Tambah verification_token |
-| [2026_01_15_000002_increase_verification_token_size.php](file:///c:/laragon/www/psb/database/migrations/2026_01_15_000002_increase_verification_token_size.php) | Perbesar verification_token ke 64 char |
+| [2025_03_01_000004_create_finance_tables.php](file:///c:/laragon/www/psb/database/migrations/2025_03_01_000004_create_finance_tables.php) | Tabel `bills` (student_id, institution_id, amount, remaining_amount, status, description) dan `transactions` (student_id, user_id, amount, payment_method, transaction_date, proof_image, notes, verification_token, payment_location, is_settled) |
+| [2025_03_01_000007_create_fund_transfers_table.php](file:///c:/laragon/www/psb/database/migrations/2025_03_01_000007_create_fund_transfers_table.php) | Tabel `fund_transfers` (institution_id, student_id, bill_id, transaction_id, user_id, amount, transfer_date, transfer_method, notes, status, approved_at/by, received_at/by) |
 
 ### Observers & Exports
 | File | Deskripsi |
