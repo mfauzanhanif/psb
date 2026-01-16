@@ -64,13 +64,12 @@ flowchart TD
     A -->|Sekolah| H
     A -->|Panitia| B
     
-    E --> E1 --> C
-    H --> H1 --> D
+    E --> E1 --> C1 --> C2
+    H --> H1 --> D1
     
-    B --> B1 --> C
-    C -->|Ya| C1
-    C1 --> C
-    C -->|Tidak/Lunas| D
+    B --> B1 --> C1 --> C2
+    C2 -->|Ya| D1
+    C2 -->|Tidak/Lunas| D
     
     D --> D1
     D1 --> D2
