@@ -2,6 +2,10 @@
 
 Algoritma prioritas menentukan pembagian dana dari pembayaran santri ke berbagai lembaga di Pondok Pesantren.
 
+> [!NOTE]
+> **Perhitungan ini dilakukan PER SANTRI**, bukan kolektif.
+> Setiap santri memiliki tagihan dan pembayaran masing-masing yang dihitung secara terpisah.
+
 ## Kapan Algoritma Digunakan?
 
 > [!IMPORTANT]
@@ -21,13 +25,11 @@ flowchart TD
         subgraph MADRASAH_DIRECT["📿 MADRASAH"]
             E["Bendahara Unit Madrasah"]
             E1["Dana langsung ke tagihan Madrasah"]
-            E2["Sisa tagihan Madrasah BERKURANG"]
         end
         
         subgraph SEKOLAH_DIRECT["🏫 SEKOLAH"]
             H["Bendahara Unit SMP/MA"]
             H1["Dana langsung ke tagihan Sekolah"]
-            H2["Sisa tagihan Sekolah BERKURANG"]
         end
     end
 
@@ -64,8 +66,8 @@ flowchart TD
     A -->|Sekolah| H
     A -->|Panitia| B
     
-    E --> E1 --> E2 --> N
-    H --> H1 --> H2 --> N
+    E --> E1 --> C
+    H --> H1 --> D2
     
     B --> B1 --> C
     C -->|Ya| C1
