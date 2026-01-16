@@ -20,14 +20,14 @@ flowchart TD
     subgraph DIRECT["⚡ PEMBAYARAN LANGSUNG"]
         subgraph MADRASAH_DIRECT["📿 MADRASAH"]
             E["Bendahara Unit Madrasah"]
-            E1["Dana langsung ke tagihan Madrasah"]
-            E2["Sisa tagihan Madrasah BERKURANG"]
+            E1["Lunas/mengurangi tagihan Madrasah"]
+            E2{"Cek sisa tagihan<br/>Madrasah"}
         end
         
         subgraph SEKOLAH_DIRECT["🏫 SEKOLAH"]
             H["Bendahara Unit SMP/MA"]
-            H1["Dana langsung ke tagihan Sekolah"]
-            H2["Sisa tagihan Sekolah BERKURANG"]
+            H1["Lunas/mengurangi tagihan Sekolah"]
+            H2{"Cek sisa tagihan<br/>Sekolah"}
         end
     end
 
@@ -64,8 +64,8 @@ flowchart TD
     A -->|Sekolah| H
     A -->|Panitia| B
     
-    E --> E1 --> E2 --> N
-    H --> H1 --> H2 --> N
+    E --> E1 --> E2 --> C
+    H --> H1 --> H2 --> D2
     
     B --> B1 --> C
     C -->|Ya| C1
