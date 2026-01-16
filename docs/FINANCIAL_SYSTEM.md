@@ -261,9 +261,6 @@ Menampilkan:
 
 ### Migrations
 
-> [!NOTE]
-> Migrasi telah dikonsolidasikan menjadi 2 file utama untuk kemudahan maintenance.
-
 | File | Deskripsi |
 |------|-----------|
 | [2025_03_01_000004_create_finance_tables.php](file:///c:/laragon/www/psb/database/migrations/2025_03_01_000004_create_finance_tables.php) | Tabel `bills` (student_id, institution_id, amount, remaining_amount, status, description) dan `transactions` (student_id, user_id, amount, payment_method, transaction_date, proof_image, notes, verification_token, payment_location, is_settled) |
