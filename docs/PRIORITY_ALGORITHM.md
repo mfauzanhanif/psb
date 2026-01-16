@@ -88,26 +88,26 @@ flowchart TD
 
 | Komponen | Tagihan |
 |----------|---------|
-| Madrasah | Rp 3.000.000 |
-| SMP | Rp 4.000.000 |
-| Pondok | Rp 8.000.000 |
-| **Total** | **Rp 15.000.000** |
+| Madrasah | Rp 290.000 |
+| SMP | Rp 2.295.000 |
+| Pondok | Rp 4.633.000 |
+| **Total** | **Rp 7.218.000** |
 
-**Pembayaran: Rp 15.000.000**
+**Pembayaran: Rp 7.218.000**
 
 ```
-1. Madrasah     → Rp 3.000.000  (100% tagihan)
-2. Sisa         = Rp 12.000.000
-3. Split 50:50  = Rp 6.000.000 masing-masing
-4. SMP          → Rp 4.000.000  (max tagihan)
-5. Overflow     = Rp 2.000.000  (ke Pondok)
-6. Pondok       → Rp 6.000.000 + Rp 2.000.000 = Rp 8.000.000
+1. Madrasah     → Rp 290.000    (100% tagihan)
+2. Sisa         = Rp 6.928.000
+3. Split 50:50  = Rp 3.464.000 masing-masing
+4. SMP          → Rp 2.295.000  (max tagihan)
+5. Overflow     = Rp 1.169.000  (ke Pondok)
+6. Pondok       → Rp 3.464.000 + Rp 1.169.000 = Rp 4.633.000
 ```
 
 **Hasil:**
-- Madrasah: Rp 3.000.000
-- SMP: Rp 4.000.000
-- Pondok: Rp 8.000.000
+- Madrasah: Rp 290.000 ✓ (Lunas)
+- SMP: Rp 2.295.000 ✓ (Lunas)
+- Pondok: Rp 4.633.000 ✓ (Lunas)
 
 ---
 
@@ -115,40 +115,47 @@ flowchart TD
 
 | Komponen | Tagihan |
 |----------|---------|
-| Madrasah | Rp 3.000.000 |
-| SMP | Rp 2.000.000 |
-| Pondok | Rp 5.000.000 |
-| **Total** | **Rp 10.000.000** |
+| Madrasah | Rp 290.000 |
+| SMP | Rp 2.295.000 |
+| Pondok | Rp 4.633.000 |
+| **Total** | **Rp 7.218.000** |
 
-**Pembayaran: Rp 8.000.000**
+**Pembayaran: Rp 4.000.000**
 
 ```
-1. Madrasah     → Rp 3.000.000  (100% tagihan)
-2. Sisa         = Rp 5.000.000
-3. Split 50:50  = Rp 2.500.000 masing-masing
-4. SMP          → Rp 2.000.000  (max tagihan)
-5. Overflow     = Rp 500.000    (ke Pondok)
-6. Pondok       → Rp 2.500.000 + Rp 500.000 = Rp 3.000.000
+1. Madrasah     → Rp 290.000    (100% tagihan)
+2. Sisa         = Rp 3.710.000
+3. Split 50:50  = Rp 1.855.000 masing-masing
+4. SMP          → Rp 1.855.000  (< tagihan, tidak ada overflow)
+5. Overflow     = Rp 0
+6. Pondok       → Rp 1.855.000
 ```
 
 **Hasil:**
-- Madrasah: Rp 3.000.000 ✓ (Lunas)
-- SMP: Rp 2.000.000 ✓ (Lunas)
-- Pondok: Rp 3.000.000 (Sisa Rp 2.000.000)
+- Madrasah: Rp 290.000 ✓ (Lunas)
+- SMP: Rp 1.855.000 (Sisa Rp 440.000)
+- Pondok: Rp 1.855.000 (Sisa Rp 2.778.000)
 
 ---
 
 ### Skenario 3: Pembayaran Sangat Kecil
 
-**Pembayaran: Rp 2.000.000**
+| Komponen | Tagihan |
+|----------|---------|
+| Madrasah | Rp 290.000 |
+| SMP | Rp 2.295.000 |
+| Pondok | Rp 4.633.000 |
+| **Total** | **Rp 7.218.000** |
+
+**Pembayaran: Rp 200.000**
 
 ```
-1. Madrasah     → Rp 2.000.000  (seluruh uang)
+1. Madrasah     → Rp 200.000  (seluruh uang < tagihan)
 2. Sisa         = Rp 0
 ```
 
 **Hasil:**
-- Madrasah: Rp 2.000.000 (Sisa Rp 1.000.000)
+- Madrasah: Rp 200.000 (Sisa Rp 90.000)
 - SMP: Rp 0
 - Pondok: Rp 0
 
