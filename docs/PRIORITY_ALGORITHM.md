@@ -5,8 +5,11 @@ Algoritma prioritas menentukan pembagian dana dari pembayaran santri ke berbagai
 ## Kapan Algoritma Digunakan?
 
 > [!IMPORTANT]
-> Algoritma prioritas **HANYA berlaku** untuk pembayaran yang diterima di **PANITIA**.
-> Pembayaran langsung ke unit (Madrasah/Sekolah) **TIDAK menggunakan** algoritma ini.
+> - Algoritma prioritas **HANYA berlaku** untuk pembayaran di **PANITIA**
+> - Pembayaran langsung ke **Madrasah/Sekolah** mengurangi **sisa tagihan**
+> - Priority Algorithm menghitung berdasarkan **sisa tagihan** (setelah pembayaran langsung)
+
+## Diagram Alur Lengkap
 
 ```mermaid
 flowchart TD
@@ -14,120 +17,111 @@ flowchart TD
         A{"Di mana pembayaran<br/>diterima?"}
     end
 
-    subgraph PANITIA["🏛️ PANITIA"]
-        B["Admin / Petugas / Bendahara Pondok"]
-        C["✅ Priority Algorithm AKTIF"]
-        D["Dana didistribusikan sesuai prioritas"]
-    end
-
-    subgraph MADRASAH["📿 MADRASAH"]
-        E["Bendahara Unit Madrasah"]
-        F["❌ Priority Algorithm TIDAK AKTIF"]
-        G["Dana langsung masuk ke Madrasah"]
-    end
-
-    subgraph SEKOLAH["🏫 SEKOLAH"]
-        H["Bendahara Unit SMP/MA"]
-        I["❌ Priority Algorithm TIDAK AKTIF"]
-        J["Dana langsung masuk ke Sekolah"]
-    end
-
-    A -->|Panitia| B
-    A -->|Madrasah| E
-    A -->|Sekolah| H
-    
-    B --> C --> D
-    E --> F --> G
-    H --> I --> J
-
-    style PANITIA fill:#e3f2fd,stroke:#1976d2
-    style MADRASAH fill:#fff3e0,stroke:#f57c00
-    style SEKOLAH fill:#e8f5e9,stroke:#388e3c
-```
-
-## Lokasi Input Pembayaran
-
-| Lokasi | Role yang Bisa Input | Algoritma Prioritas | Alokasi Dana |
-|--------|---------------------|---------------------|--------------|
-| **Panitia** | Administrator, Petugas, Bendahara Pondok | ✅ Aktif | Didistribusikan via algoritma |
-| **Madrasah** | Bendahara Unit (Madrasah) | ❌ Tidak Aktif | Langsung ke Madrasah |
-| **Sekolah** | Bendahara Unit (SMP/MA) | ❌ Tidak Aktif | Langsung ke Sekolah |
-
----
-
-## Algoritma Prioritas (Hanya untuk Panitia)
-
-### Urutan Prioritas
-
-```mermaid
-flowchart TD
-    subgraph INPUT["💰 INPUT (dari Panitia)"]
-        A["Total Pembayaran Santri"]
-    end
-
-    subgraph PRIORITY1["🥇 PRIORITAS 1: MADRASAH"]
-        B{"Sisa Dana > 0?"}
-        C["Alokasi ke Madrasah<br/>(100% hingga lunas)"]
-        D["Madrasah Selesai"]
-    end
-
-    subgraph PRIORITY2["🥈 PRIORITAS 2: 50:50 SPLIT"]
-        E["Bagi Sisa Dana<br/>50% : 50%"]
-        
-        subgraph SEKOLAH_SPLIT["🏫 SEKOLAH"]
-            F["Alokasi 50%"]
-            G{"Melebihi<br/>Tagihan?"}
-            H["Terima max Tagihan"]
-            I["Terima 50%"]
-            J["Overflow → Pondok"]
+    subgraph DIRECT["⚡ PEMBAYARAN LANGSUNG"]
+        subgraph MADRASAH_DIRECT["📿 MADRASAH"]
+            E["Bendahara Unit Madrasah"]
+            E1["Dana langsung ke tagihan Madrasah"]
+            E2["Sisa tagihan Madrasah BERKURANG"]
         end
         
-        subgraph PONDOK["🏠 PONDOK"]
-            K["Terima 50%"]
-            L["+ Overflow Sekolah"]
-            M["Total Alokasi Pondok"]
+        subgraph SEKOLAH_DIRECT["🏫 SEKOLAH"]
+            H["Bendahara Unit SMP/MA"]
+            H1["Dana langsung ke tagihan Sekolah"]
+            H2["Sisa tagihan Sekolah BERKURANG"]
+        end
+    end
+
+    subgraph PANITIA["🏛️ PANITIA - PRIORITY ALGORITHM"]
+        B["Admin / Petugas / Bendahara Pondok"]
+        B1["Hitung SISA TAGIHAN<br/>(setelah pembayaran langsung)"]
+        
+        subgraph PRIORITY1["🥇 PRIORITAS 1: MADRASAH"]
+            C{"Sisa Tagihan<br/>Madrasah > 0?"}
+            C1["Alokasi ke Madrasah<br/>(hingga lunas)"]
+        end
+        
+        subgraph PRIORITY2["🥈 PRIORITAS 2: 50:50 SPLIT"]
+            D["Bagi Sisa Dana 50% : 50%"]
+            
+            subgraph SEKOLAH_SPLIT["SEKOLAH"]
+                D1["Alokasi 50%"]
+                D2{"Melebihi sisa<br/>tagihan Sekolah?"}
+                D3["Terima max sisa tagihan"]
+                D4["Overflow → Pondok"]
+            end
+            
+            subgraph PONDOK_SPLIT["PONDOK"]
+                D5["Terima 50% + Overflow"]
+            end
         end
     end
 
     subgraph OUTPUT["✅ OUTPUT"]
-        N["Entitlement Per Lembaga"]
+        N["Total Penerimaan Per Lembaga:<br/>Pembayaran Langsung + Distribusi Panitia"]
     end
 
-    A --> B
-    B -->|Ya| C
-    C --> D
-    D --> B
-    B -->|"Sisa > 0"| E
+    A -->|Madrasah| E
+    A -->|Sekolah| H
+    A -->|Panitia| B
     
-    E --> F
-    F --> G
-    G -->|Ya| H
-    G -->|Tidak| I
-    H --> J
-    J --> L
-    I --> N
+    E --> E1 --> E2 --> N
+    H --> H1 --> H2 --> N
     
-    E --> K
-    K --> L
-    L --> M
-    M --> N
+    B --> B1 --> C
+    C -->|Ya| C1
+    C1 --> C
+    C -->|Tidak/Lunas| D
+    
+    D --> D1
+    D1 --> D2
+    D2 -->|Ya| D3 --> D4
+    D2 -->|Tidak| N
+    D4 --> D5
+    D --> D5
+    D5 --> N
 
-    style INPUT fill:#e3f2fd,stroke:#1976d2
-    style PRIORITY1 fill:#fff3e0,stroke:#f57c00
-    style PRIORITY2 fill:#e8f5e9,stroke:#388e3c
-    style SEKOLAH_SPLIT fill:#fce4ec,stroke:#c2185b
-    style PONDOK fill:#f3e5f5,stroke:#7b1fa2
-    style OUTPUT fill:#e0f7fa,stroke:#0097a7
+    style INPUT fill:#f5f5f5,stroke:#9e9e9e
+    style DIRECT fill:#e8f5e9,stroke:#4caf50
+    style MADRASAH_DIRECT fill:#fff3e0,stroke:#ff9800
+    style SEKOLAH_DIRECT fill:#e3f2fd,stroke:#2196f3
+    style PANITIA fill:#fce4ec,stroke:#e91e63
+    style PRIORITY1 fill:#fff8e1,stroke:#ffc107
+    style PRIORITY2 fill:#f3e5f5,stroke:#9c27b0
+    style SEKOLAH_SPLIT fill:#e1f5fe,stroke:#03a9f4
+    style PONDOK_SPLIT fill:#ede7f6,stroke:#673ab7
+    style OUTPUT fill:#c8e6c9,stroke:#4caf50
 ```
 
-### Ringkasan Algoritma
+## Lokasi Input Pembayaran
 
-1. **Prioritas 1: MADRASAH** - Madrasah mendapat 100% dana hingga tagihan lunas
-2. **Prioritas 2: 50:50 SPLIT** - Sisa dana dibagi antara Sekolah dan Pondok
-   - Sekolah tidak bisa menerima lebih dari tagihannya (plafond)
-   - Overflow dari Sekolah masuk ke Pondok
+| Lokasi | Role | Algoritma | Efek |
+|--------|------|-----------|------|
+| **Panitia** | Admin, Petugas, Bd. Pondok | ✅ Aktif | Distribusi via algoritma ke sisa tagihan |
+| **Madrasah** | Bendahara Madrasah | ❌ Tidak | Langsung kurangi tagihan Madrasah |
+| **Sekolah** | Bendahara SMP/MA | ❌ Tidak | Langsung kurangi tagihan Sekolah |
 
 ---
+
+## Cara Kerja Priority Algorithm
+
+### Langkah 1: Hitung Sisa Tagihan
+
+Sebelum algoritma berjalan, sistem menghitung **sisa tagihan** yang belum dibayar:
+
+```
+Sisa Tagihan Madrasah = Tagihan Madrasah - Pembayaran Langsung ke Madrasah
+Sisa Tagihan Sekolah  = Tagihan Sekolah  - Pembayaran Langsung ke Sekolah
+Sisa Tagihan Pondok   = Tagihan Pondok   - Pembayaran Langsung ke Pondok
+```
+
+### Langkah 2: Distribusi Dana Panitia
+
+Dana dari Panitia didistribusikan berdasarkan **sisa tagihan**:
+
+1. **Prioritas 1: MADRASAH** - Alokasi 100% ke sisa tagihan Madrasah
+2. **Prioritas 2: 50:50 SPLIT** - Sisa dana dibagi ke Sekolah dan Pondok
+   - Sekolah maksimal menerima sebesar sisa tagihannya
+   - Overflow dari Sekolah masuk ke Pondok
 
 ## Pembayaran Langsung ke Unit
 
