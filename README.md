@@ -48,11 +48,10 @@ Mendukung pengelolaan untuk:
 
 | Komponen | Versi Minimum |
 |----------|---------------|
-| PHP | 8.2+ |
-| MySQL/MariaDB | 5.7+ / 10.3+ |
-| Composer | 2.x |
+| PHP | 8.4+ |
+| MySQL/MariaDB | 8.0+ |
+| Composer | 2.7+ |
 | Node.js | 18.x+ |
-| NPM | 9.x+ |
 
 ### Ekstensi PHP yang Diperlukan
 - BCMath

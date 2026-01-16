@@ -1,0 +1,1 @@
+function t(){const i=new IntersectionObserver(e=>{e.forEach(n=>{n.isIntersecting&&n.target.classList.add("visible")})},{threshold:.1});document.querySelectorAll(".animate-on-scroll").forEach(e=>{i.observe(e)})}document.addEventListener("DOMContentLoaded",function(){t()});document.addEventListener("livewire:navigated",function(){t()});
