@@ -17,45 +17,67 @@ Sistem ini melacak **di mana uang fisik berada** dan **ke lembaga mana langsung 
 
 ```mermaid
 flowchart TD
-    subgraph INPUT["💰 SANTRI MEMBAYAR"]
-        A["Wali Santri"]
-    end
+    %% =========================================================================
+    %% DEFINISI NODES & STYLE
+    %% =========================================================================
+    
+    %% Terminal Nodes
+    Start([Mulai: Wali Santri Membayar])
+    End([Selesai])
 
-    subgraph PANITIA["🏛️ PANITIA"]
-        B["Admin / Petugas / Bendahara Pondok"]
-        B1["payment_location = PANITIA"]
-        B2["is_settled = FALSE"]
-        B3["Priority Algorithm AKTIF"]
-        B4["Perlu Manual Settlement"]
-    end
+    %% Input / Decision
+    Source{Via Jalur Mana?}
+    
+    %% Storage / Database (Kas)
+    KasMadrasah[(Kas Madrasah)]
+    KasSekolah[(Kas Sekolah SMP/MA)]
+    KasPondok[(Kas Pondok)]
+    FloatingCash[(Floating Cash Panitia)]
+    
+    %% Process Nodes
+    Panitia[Admin / Petugas / Bd. Pondok]
+    Madrasah[Bendahara Madrasah]
+    Sekolah[Bendahara SMP/MA]
 
-    subgraph MADRASAH["📿 MADRASAH"]
-        C["Bendahara Unit Madrasah"]
-        C1["payment_location = MADRASAH"]
-        C2["is_settled = TRUE"]
-        C3["Langsung ke tagihan Madrasah"]
-        C4["Auto FundTransfer COMPLETED"]
-    end
+    %% Styles
+    classDef storage fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef process fill:#fff3e0,stroke:#e65100,stroke-width:1px;
+    classDef decision fill:#f3e5f5,stroke:#4a148c,stroke-width:1px;
+    
+    class KasMadrasah,KasSekolah,KasPondok,FloatingCash storage;
+    class Source decision;
+    class Panitia,Madrasah,Sekolah process;
 
-    subgraph SEKOLAH["🏫 SEKOLAH"]
-        D["Bendahara Unit SMP/MA"]
-        D1["payment_location = SEKOLAH"]
-        D2["is_settled = TRUE"]
-        D3["Langsung ke tagihan Sekolah"]
-        D4["Auto FundTransfer COMPLETED"]
-    end
+    %% =========================================================================
+    %% ALUR DIAGRAM
+    %% =========================================================================
 
-    A -->|Bayar di Panitia| B
-    A -->|Bayar di Madrasah| C
-    A -->|Bayar di Sekolah| D
+    Start --> Source
 
-    B --> B1 --> B2 --> B3 --> B4
-    C --> C1 --> C2 --> C3 --> C4
-    D --> D1 --> D2 --> D3 --> D4
+    %% ---------------------------------------------------------
+    %% JALUR 1: PEMBAYARAN DI PANITIA
+    %% ---------------------------------------------------------
+    Source -->|"Di Panitia"| Panitia
+    Panitia --> FloatingCash
+    FloatingCash --> PriorityAlgo[Priority Algorithm]
+    PriorityAlgo --> ManualSettlement[Manual Settlement ke Unit]
+    ManualSettlement --> End
 
-    style PANITIA fill:#e3f2fd,stroke:#1976d2
-    style MADRASAH fill:#fff3e0,stroke:#f57c00
-    style SEKOLAH fill:#e8f5e9,stroke:#388e3c
+    %% ---------------------------------------------------------
+    %% JALUR 2: PEMBAYARAN LANGSUNG KE MADRASAH
+    %% ---------------------------------------------------------
+    Source -->|"Di Madrasah"| Madrasah
+    Madrasah --> KasMadrasah
+    KasMadrasah --> UpdateTagihanMadrasah[Update Tagihan Madrasah]
+    UpdateTagihanMadrasah --> End
+
+    %% ---------------------------------------------------------
+    %% JALUR 3: PEMBAYARAN LANGSUNG KE SEKOLAH
+    %% ---------------------------------------------------------
+    Source -->|"Di Sekolah"| Sekolah
+    Sekolah --> KasSekolah
+    KasSekolah --> UpdateTagihanSekolah[Update Tagihan Sekolah]
+    UpdateTagihanSekolah --> End
 ```
 
 ## Lokasi Pembayaran

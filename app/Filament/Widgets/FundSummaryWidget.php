@@ -42,9 +42,16 @@ class FundSummaryWidget extends Widget
             ->toArray();
     }
 
+    public function getPanitiaSummary(): array
+    {
+        $service = app(PaymentDistributionService::class);
+        return $service->getPanitiaSummary();
+    }
+
     protected function getViewData(): array
     {
         return [
+            'panitiaSummary' => $this->getPanitiaSummary(),
             'summary' => $this->getSummary(),
             'floatingCash' => $this->getFloatingCash(),
             'pendingSettlements' => $this->getPendingSettlements(),

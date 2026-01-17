@@ -602,40 +602,97 @@ class StudentResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
-                        'draft' => 'gray',
-                        'verified' => 'warning',
+                        'draft' => 'warning',
                         'accepted' => 'success',
                         'rejected' => 'danger',
+                        default => 'gray',
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'draft' => 'Draft / Menunggu',
-                        'verified' => 'Terverifikasi',
+                        'draft' => 'Menunggu',
                         'accepted' => 'Diterima',
-                        'rejected' => 'Ditolak',
+                        'rejected' => 'Mengundurkan Diri',
                         default => $state,
                     }),
-                Tables\Columns\TextColumn::make('total_bill')
-                    ->label('Total Tagihan')
-                    ->getStateUsing(fn(Student $record) => $record->bills->sum('amount'))
-                    ->formatStateUsing(fn($state) => 'Rp. ' . number_format($state, 0, ',', ',')),
-                Tables\Columns\TextColumn::make('total_paid')
-                    ->label('Sudah Bayar')
-                    ->getStateUsing(fn(Student $record) => $record->bills->sum('amount') - $record->bills->sum('remaining_amount'))
-                    ->formatStateUsing(fn($state) => 'Rp. ' . number_format($state, 0, ',', ','))
-                    ->color('success'),
-                Tables\Columns\TextColumn::make('total_remaining')
-                    ->label('Belum Bayar')
-                    ->getStateUsing(fn(Student $record) => $record->bills->sum('remaining_amount'))
-                    ->formatStateUsing(fn($state) => 'Rp. ' . number_format($state, 0, ',', ','))
-                    ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
+                Tables\Columns\TextColumn::make('full_address')
+                    ->label('Alamat')
+                    ->getStateUsing(function (Student $record) {
+                        $parts = array_filter([
+                            $record->address_street,
+                            $record->village,
+                            $record->district,
+                            $record->regency,
+                            $record->province,
+                        ]);
+                        return implode(', ', $parts) ?: '-';
+                    })
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('parents_names')
+                    ->label('Nama Orang Tua')
+                    ->getStateUsing(function (Student $record) {
+                        $names = [];
+                        foreach ($record->parents as $parent) {
+                            $type = match ($parent->type) {
+                                'father' => 'ayah',
+                                'mother' => 'ibu',
+                                'guardian' => 'wali',
+                                default => $parent->type,
+                            };
+                            $names[] = "{$parent->name} ({$type})";
+                        }
+                        return implode(', ', $names) ?: '-';
+                    })
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('parents_contacts')
+                    ->label('Kontak')
+                    ->getStateUsing(function (Student $record) {
+                        $contacts = [];
+                        foreach ($record->parents as $parent) {
+                            if (!empty($parent->phone_number)) {
+                                $type = match ($parent->type) {
+                                    'father' => 'ayah',
+                                    'mother' => 'ibu',
+                                    'guardian' => 'wali',
+                                    default => $parent->type,
+                                };
+                                $contacts[] = "{$parent->phone_number} ({$type})";
+                            }
+                        }
+                        return implode(', ', $contacts) ?: '-';
+                    })
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('document_status')
+                    ->label('Kelengkapan Dokumen')
+                    ->getStateUsing(function (Student $record) {
+                        $requiredDocs = ['kk', 'akta', 'ijazah', 'photo', 'ktp_ayah', 'ktp_ibu'];
+                        $uploadedDocs = $record->documents->pluck('type')->toArray();
+                        $missingDocs = array_diff($requiredDocs, $uploadedDocs);
+                        
+                        if (empty($missingDocs)) {
+                            return 'Lengkap';
+                        }
+                        
+                        $docLabels = [
+                            'kk' => 'KK',
+                            'akta' => 'Akta',
+                            'ijazah' => 'Ijazah',
+                            'photo' => 'Foto',
+                            'ktp_ayah' => 'KTP Ayah',
+                            'ktp_ibu' => 'KTP Ibu',
+                        ];
+                        
+                        $missing = array_map(fn($doc) => $docLabels[$doc] ?? $doc, $missingDocs);
+                        return implode(', ', $missing);
+                    })
+                    ->badge()
+                    ->color(fn($state) => $state === 'Lengkap' ? 'success' : 'warning'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'draft' => 'Menunggu',
-                        'verified' => 'Terverifikasi',
                         'accepted' => 'Diterima',
-                        'rejected' => 'Ditolak',
+                        'rejected' => 'Mengundurkan Diri',
                     ]),
                 Tables\Filters\SelectFilter::make('destination_institution_id')
                     ->label('Sekolah')
@@ -644,13 +701,6 @@ class StudentResource extends Resource
             ->actions($canModify ? [
                 EditAction::make(),
                 ActionGroup::make([
-                    Action::make('verify')
-                        ->label('Verifikasi')
-                        ->icon('heroicon-o-check')
-                        ->color('warning')
-                        ->requiresConfirmation()
-                        ->action(fn(Student $record) => $record->update(['status' => 'verified'])),
-
                     Action::make('accept')
                         ->label('Terima')
                         ->icon('heroicon-o-check-badge')
@@ -659,7 +709,7 @@ class StudentResource extends Resource
                         ->action(fn(Student $record) => $record->update(['status' => 'accepted'])),
 
                     Action::make('reject')
-                        ->label('Tolak')
+                        ->label('Mengundurkan Diri')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->requiresConfirmation()

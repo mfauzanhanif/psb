@@ -56,11 +56,27 @@ class Transaction extends Model
     }
 
     /**
-     * Check if payment is at UNIT (direct collection).
+     * Check if payment is at UNIT (direct collection to Madrasah or Sekolah).
      */
     public function isAtUnit(): bool
     {
-        return $this->payment_location === 'UNIT';
+        return in_array($this->payment_location, ['UNIT', 'MADRASAH', 'SEKOLAH']);
+    }
+
+    /**
+     * Check if payment is at Madrasah.
+     */
+    public function isAtMadrasah(): bool
+    {
+        return $this->payment_location === 'MADRASAH';
+    }
+
+    /**
+     * Check if payment is at Sekolah (SMP/MA).
+     */
+    public function isAtSekolah(): bool
+    {
+        return $this->payment_location === 'SEKOLAH';
     }
 
     /**
@@ -116,17 +132,16 @@ class Transaction extends Model
      */
     public function getPaymentLocationLabel(): string
     {
-        if ($this->payment_location === 'PANITIA') {
-            return 'Panitia';
-        }
-
-        // For UNIT, get the institution name from the user who created it
-        if ($this->user && $this->user->institution) {
-            $institution = $this->user->institution;
-
-            return 'Bendahara '.$institution->name;
-        }
-
-        return 'Unit';
+        return match ($this->payment_location) {
+            'PANITIA' => 'Panitia',
+            'MADRASAH' => 'Bendahara Madrasah',
+            'SEKOLAH' => $this->user?->institution
+                ? 'Bendahara ' . $this->user->institution->name
+                : 'Bendahara Sekolah',
+            'UNIT' => $this->user?->institution
+                ? 'Bendahara ' . $this->user->institution->name
+                : 'Unit',
+            default => 'Unknown',
+        };
     }
 }

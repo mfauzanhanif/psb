@@ -13,8 +13,8 @@ use Illuminate\Support\Collection;
 class PaymentDistributionService
 {
     /**
-     * Calculate FIXED entitlement for each institution based on TOTAL PAID amount.
-     * This entitlement does NOT change after transfers are made.
+     * Calculate FIXED entitlement for each institution based on PANITIA payments only.
+     * Direct payments to MADRASAH/SEKOLAH are NOT included - they're already applied directly.
      * Uses priority algorithm: Madrasah → 50:50 Sekolah/Pondok with overflow.
      *
      * @param Student $student
@@ -22,9 +22,11 @@ class PaymentDistributionService
      */
     public function calculateStudentEntitlement(Student $student): array
     {
-        $totalPaid = $student->getTotalPaid();
+        // Only use PANITIA payments for Priority Algorithm
+        // Direct payments to MADRASAH/SEKOLAH are already applied to their bills
+        $panitiaPaid = $student->getPaidAtPanitia();
 
-        if ($totalPaid <= 0) {
+        if ($panitiaPaid <= 0) {
             return [];
         }
 
@@ -37,12 +39,12 @@ class PaymentDistributionService
         }
 
         $entitlements = [];
-        $remainingAmount = $totalPaid;
+        $remainingAmount = $panitiaPaid;
 
         // Group bills by institution type
         $billsByType = $bills->groupBy(fn($bill) => $bill->institution?->type ?? 'unknown');
 
-        // Step 1: Madrasah Priority - Full bill amount
+        // Step 1: Madrasah Priority - Full bill amount (minus what's already paid directly)
         $remainingAmount = $this->allocateEntitlement(
             $billsByType,
             'madrasah',
@@ -248,20 +250,72 @@ class PaymentDistributionService
     }
 
     /**
-     * Get summary for dashboard widget - includes ALL institutions with entitlements.
+     * Get summary for dashboard widget - includes ALL institutions with their totals.
+     * Shows both Priority Algorithm entitlements AND direct unit payments.
      *
      * @return Collection
      */
     public function getFundSummary(): Collection
     {
-        return $this->calculateBulkDistribution()->map(function ($data) {
-            return [
-                'institution' => $data['institution'],
-                'total_entitlement' => $data['total_entitlement'],
-                'total_transferred' => $data['total_transferred'],
-                'pending_amount' => $data['total_pending'],
-            ];
-        });
+        // Get Priority Algorithm distribution (from PANITIA payments only)
+        $priorityDistribution = $this->calculateBulkDistribution();
+        
+        // Get all institutions to ensure we show all of them
+        $allInstitutions = Institution::all();
+        
+        $summary = collect();
+        
+        foreach ($allInstitutions as $institution) {
+            // Get direct payments to this institution (MADRASAH/SEKOLAH payments)
+            $directPayments = $this->getDirectPaymentsToInstitution($institution);
+            
+            // Get Priority Algorithm data if exists
+            $priorityData = $priorityDistribution->get($institution->id);
+            $priorityEntitlement = $priorityData['total_entitlement'] ?? 0;
+            $priorityTransferred = $priorityData['total_transferred'] ?? 0;
+            $priorityPending = $priorityData['total_pending'] ?? 0;
+            
+            // Calculate totals
+            $totalEntitlement = $priorityEntitlement + $directPayments;
+            $totalReceived = $priorityTransferred + $directPayments; // Direct payments are already "received"
+            $pendingAmount = $priorityPending; // Only priority algorithm has pending
+            
+            // Only include institutions with activity
+            if ($totalEntitlement > 0 || $directPayments > 0) {
+                $summary->put($institution->id, [
+                    'institution' => $institution,
+                    'total_entitlement' => $totalEntitlement,
+                    'total_transferred' => $totalReceived,
+                    'pending_amount' => $pendingAmount,
+                    'direct_payments' => $directPayments,
+                    'priority_entitlement' => $priorityEntitlement,
+                ]);
+            }
+        }
+        
+        return $summary->values();
+    }
+
+    /**
+     * Get total direct payments made to a specific institution.
+     * These are payments with payment_location = MADRASAH or SEKOLAH.
+     */
+    public function getDirectPaymentsToInstitution(Institution $institution): float
+    {
+        $paymentLocation = match ($institution->type) {
+            'madrasah' => 'MADRASAH',
+            'smp', 'ma', 'mts' => 'SEKOLAH',
+            default => null,
+        };
+        
+        if (!$paymentLocation) {
+            return 0;
+        }
+        
+        // Get direct payments where the user belongs to this institution
+        return (float) Transaction::where('payment_location', $paymentLocation)
+            ->whereHas('user', fn($q) => $q->where('institution_id', $institution->id))
+            ->sum('amount');
     }
 
     /**
@@ -275,17 +329,46 @@ class PaymentDistributionService
     }
 
     /**
+     * Get summary of Panitia payments for the first table.
+     * Returns: total_panitia, total_distributed, total_pending
+     */
+    public function getPanitiaSummary(): array
+    {
+        $totalPanitia = (float) Transaction::where('payment_location', 'PANITIA')->sum('amount');
+        
+        // Total distributed = sum of all FundTransfers from Panitia (not direct payments)
+        $totalDistributed = (float) FundTransfer::whereHas('transaction', function($q) {
+            $q->where('payment_location', 'PANITIA');
+        })->whereIn('status', ['COMPLETED', 'APPROVED', 'PENDING'])->sum('amount');
+        
+        $totalPending = $totalPanitia - $totalDistributed;
+        
+        return [
+            'total_panitia' => $totalPanitia,
+            'total_distributed' => $totalDistributed,
+            'total_pending' => max(0, $totalPending),
+        ];
+    }
+
+    /**
      * Get total cash held at a specific UNIT.
      * = Direct UNIT payments + Received (COMPLETED) transfers
      */
     public function getCashAtUnit(Institution $institution): float
     {
-        // Direct unit payments
-        $directPayments = (float) Transaction::where('payment_location', 'UNIT')
+        // Determine payment location based on institution type
+        $paymentLocation = match ($institution->type) {
+            'madrasah' => 'MADRASAH',
+            'smp', 'ma', 'mts' => 'SEKOLAH',
+            default => 'UNIT',
+        };
+
+        // Direct unit payments to this institution
+        $directPayments = (float) Transaction::whereIn('payment_location', [$paymentLocation, 'UNIT'])
             ->whereHas('student.bills', fn($q) => $q->where('institution_id', $institution->id))
             ->sum('amount');
 
-        // Received transfers
+        // Received transfers (COMPLETED)
         $receivedTransfers = (float) FundTransfer::where('institution_id', $institution->id)
             ->where('status', 'COMPLETED')
             ->sum('amount');

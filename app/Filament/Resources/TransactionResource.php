@@ -73,9 +73,19 @@ class TransactionResource extends Resource
                         Select::make('student_id')
                             ->label('Santri')
                             ->options(function () {
-                                return Student::query()
-                                    ->whereHas('bills', fn($q) => $q->where('remaining_amount', '>', 0))
-                                    ->get()
+                                $user = auth()->user();
+                                $query = Student::query()
+                                    ->whereHas('bills', fn($q) => $q->where('remaining_amount', '>', 0));
+                                
+                                // Filter by institution for Bendahara Unit
+                                if ($user->hasRole('Bendahara Unit') && $user->institution_id) {
+                                    $institution = $user->institution;
+                                    if ($institution && in_array($institution->type, ['smp', 'ma', 'mts'])) {
+                                        $query->whereHas('registration', fn($q) => $q->where('destination_institution_id', $user->institution_id));
+                                    }
+                                }
+                                
+                                return $query->get()
                                     ->mapWithKeys(fn($s) => [$s->id => "{$s->registration_number} - {$s->full_name}"]);
                             })
                             ->searchable()
@@ -179,16 +189,21 @@ class TransactionResource extends Resource
                     ->label('Santri')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('distribution_status')
-                    ->label('Status Distribusi')
-                    ->getStateUsing(fn(Transaction $record) => $record->isFullyDistributed() ? 'Sudah Disetor' : 'Menunggu Distribusi')
-                    ->badge()
-                    ->color(fn(Transaction $record) => $record->isFullyDistributed() ? 'success' : 'warning'),
                 Tables\Columns\TextColumn::make('payment_location')
-                    ->label('Lokasi Dana')
+                    ->label('Pembayaran via')
                     ->badge()
-                    ->getStateUsing(fn(Transaction $record) => $record->getPaymentLocationLabel())
-                    ->color(fn(Transaction $record) => $record->isAtPanitia() ? 'warning' : 'info'),
+                    ->getStateUsing(fn(Transaction $record) => match($record->payment_location) {
+                        'PANITIA' => 'Panitia',
+                        'MADRASAH' => 'Madrasah',
+                        'SEKOLAH' => $record->user?->institution?->type === 'smp' ? 'SMP' : 'MA',
+                        default => 'Unit',
+                    })
+                    ->color(fn(Transaction $record) => match($record->payment_location) {
+                        'PANITIA' => 'warning',
+                        'MADRASAH' => 'info',
+                        'SEKOLAH' => 'success',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Jumlah')
                     ->formatStateUsing(fn($state) => 'Rp. ' . number_format($state, 0, ',', ','))
@@ -198,12 +213,6 @@ class TransactionResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn(?string $state) => $state === 'cash' ? 'Cash' : 'Transfer')
                     ->color(fn(?string $state) => $state === 'cash' ? 'success' : 'info'),
-                Tables\Columns\TextColumn::make('undistributed_amount')
-                    ->label('Belum Disetor')
-                    ->getStateUsing(fn(Transaction $record) => $record->getUndistributedAmount())
-                    ->formatStateUsing(fn($state) => $state > 0 ? 'Rp. ' . number_format($state, 0, ',', ',') : '-')
-                    ->color(fn($state) => $state > 0 ? 'warning' : 'success')
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('transaction_date')
                     ->label('Tanggal')
                     ->date('d/m/Y')
@@ -229,10 +238,11 @@ class TransactionResource extends Resource
                         'transfer' => 'Transfer',
                     ]),
                 Tables\Filters\SelectFilter::make('payment_location')
-                    ->label('Lokasi Dana')
+                    ->label('Pembayaran via')
                     ->options([
                         'PANITIA' => 'Panitia',
-                        'UNIT' => 'Unit',
+                        'MADRASAH' => 'Madrasah',
+                        'SEKOLAH' => 'SMP/MA',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_settled')
                     ->label('Status Settle')

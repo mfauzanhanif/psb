@@ -196,6 +196,17 @@ class Student extends Model
     }
 
     /**
+     * Get total amount paid at PANITIA only (for Priority Algorithm).
+     * This excludes direct payments to MADRASAH/SEKOLAH.
+     */
+    public function getPaidAtPanitia(): float
+    {
+        return (float) $this->transactions()
+            ->where('payment_location', 'PANITIA')
+            ->sum('amount');
+    }
+
+    /**
      * Get total bill amount for this student.
      */
     public function getTotalBillAmount(): float

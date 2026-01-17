@@ -13,91 +13,98 @@ Algoritma prioritas menentukan pembagian dana dari pembayaran santri ke berbagai
 
 ```mermaid
 flowchart TD
-    subgraph INPUT["💰 PEMBAYARAN MASUK"]
-        A{"Di mana pembayaran<br/>diterima?"}
-    end
-
-    subgraph DIRECT["⚡ PEMBAYARAN LANGSUNG"]
-        subgraph MADRASAH_DIRECT["📿 MADRASAH"]
-            E["Bendahara Madrasah"]
-            E1["Lunas/mengurangi tagihan Madrasah"]
-        end
-        
-        subgraph SEKOLAH_DIRECT["🏫 SEKOLAH"]
-            H["Bendahara Sekolah SMP/MA"]
-            H1["Lunas/mengurangi tagihan Sekolah"]
-        end
-    end
-
-    subgraph PANITIA["🏛️ PANITIA - PRIORITY ALGORITHM"]
-        B["Admin / Petugas / Bendahara Pondok"]
-        B1["Hitung SISA TAGIHAN<br/>(setelah pembayaran langsung)"]
-        
-        subgraph PRIORITY1["🥇 PRIORITAS 1: MADRASAH"]
-            C["Cek sisa tagihan Madrasah"]
-            C1{"Sisa Tagihan<br/>Madrasah > 0?"}
-            C2["Alokasi ke Madrasah<br/>(hingga lunas)"]
-        end
-        
-        subgraph PRIORITY2["🥈 PRIORITAS 2: 50:50 SPLIT"]
-            D["Bagi Sisa Dana 50% : 50%"]
-            
-            subgraph SEKOLAH_SPLIT["SEKOLAH"]
-                D1["Alokasi 50%"]
-                D2["Cek sisa tagihan Sekolah"]
-                D3{"Melebihi sisa<br/>tagihan Sekolah?"}
-                D4["Terima max sisa tagihan"]
-                D5["Overflow → Pondok"]
-            end
-            
-            subgraph PONDOK_SPLIT["PONDOK"]
-                D6["Terima 50% + Overflow"]
-            end
-        end
-    end
-
-    subgraph OUTPUT["✅ OUTPUT"]
-        N["Total Penerimaan Per Lembaga"]
-    end
-
-    %% Input routing
-    A -->|Madrasah| E
-    A -->|Sekolah| H
-    A -->|Panitia| B
-
-    %% Direct Madrasah flow
-    E --> E1 --> C
+    %% =========================================================================
+    %% DEFINISI NODES & STYLE
+    %% =========================================================================
     
-    %% Direct Sekolah flow
-    H --> H1 --> D2
+    %% Terminal Nodes
+    Start([Mulai: Pembayaran Santri])
+    End([Selesai])
 
-    %% Panitia flow - Priority 1 (Madrasah)
-    B --> B1 --> C
-    C --> C1
-    C1 -->|Ya| C2
-    C2 --> C1
-    C1 -->|Tidak/Lunas| D
+    %% Input / Decision
+    Source{Via Jalur Mana?}
     
-    %% Priority 2 (50:50 Split)
-    D --> D1
-    D1 --> D2
-    D2 --> D3
-    D3 -->|Ya| D4 --> D5
-    D3 -->|Tidak| N
-    D5 --> D6
-    D --> D6
-    D6 --> N
+    %% Storage / Database (Kas)
+    KasMadrasah[(Kas Madrasah)]
+    KasSekolah[(Kas Sekolah SMP/MA)]
+    KasPondok[(Kas Pondok)]
+    
+    %% Holding Area
+    Holding[Holding Area / Dana Masuk]
 
-    style INPUT fill:#f5f5f5,stroke:#9e9e9e
-    style DIRECT fill:#e8f5e9,stroke:#4caf50
-    style MADRASAH_DIRECT fill:#fff3e0,stroke:#ff9800
-    style SEKOLAH_DIRECT fill:#e3f2fd,stroke:#2196f3
-    style PANITIA fill:#fce4ec,stroke:#e91e63
-    style PRIORITY1 fill:#fff8e1,stroke:#ffc107
-    style PRIORITY2 fill:#f3e5f5,stroke:#9c27b0
-    style SEKOLAH_SPLIT fill:#e1f5fe,stroke:#03a9f4
-    style PONDOK_SPLIT fill:#ede7f6,stroke:#673ab7
-    style OUTPUT fill:#c8e6c9,stroke:#4caf50
+    %% Styles
+    classDef storage fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef process fill:#fff3e0,stroke:#e65100,stroke-width:1px;
+    classDef decision fill:#f3e5f5,stroke:#4a148c,stroke-width:1px;
+    
+    class KasMadrasah,KasSekolah,KasPondok,Holding storage;
+    class Source,Check_Madrasah,Check_Sekolah decision;
+
+    %% =========================================================================
+    %% ALUR DIAGRAM
+    %% =========================================================================
+
+    Start --> Source
+
+    %% ---------------------------------------------------------
+    %% JALUR 1: PEMBAYARAN LANGSUNG (DIRECT)
+    %% ---------------------------------------------------------
+    Source -->|"Langsung ke Sekolah"| DirectSekolah[Terima Pembayaran Sekolah]
+    DirectSekolah --> KasSekolah
+
+    Source -->|"Langsung ke Madrasah"| DirectMadrasah[Terima Pembayaran Madrasah]
+    DirectMadrasah --> KasMadrasah
+
+    %% Update Tagihan Flow
+    KasSekolah --> UpdateTagihanSekolah[Update Tagihan: Lunas/Berkurang]
+    KasMadrasah --> UpdateTagihanMadrasah[Update Tagihan: Lunas/Berkurang]
+    KasPondok --> UpdateTagihanPondok[Update Tagihan: Lunas/Berkurang]
+
+    UpdateTagihanSekolah --> End
+    UpdateTagihanMadrasah --> End
+    UpdateTagihanPondok --> End
+
+    %% ---------------------------------------------------------
+    %% JALUR 2: VIA PANITIA (PRIORITY ALGORITHM)
+    %% ---------------------------------------------------------
+    Source -->|"Via Panitia"| Holding
+    
+    %% PRIORITY 1: MADRASAH
+    subgraph Prio1 [Prioritas 1: Lunasi Madrasah]
+        Check_Madrasah{Dana >= Tagihan Madrasah?}
+        Pay_Full_Madrasah[Alokasi Full Tagihan ke Madrasah]
+        Pay_Partial_Madrasah[Alokasi Semua Dana ke Madrasah]
+    end
+
+    Holding --> Check_Madrasah
+    
+    %% Case: Dana Kurang -> Partial Payment & STOP
+    Check_Madrasah -->|"Tidak (Kurang)"| Pay_Partial_Madrasah
+    Pay_Partial_Madrasah --> KasMadrasah
+
+    %% Case: Dana Cukup -> Full Payment & CONTINUE
+    Check_Madrasah -->|"Ya (Cukup/Lebih)"| Pay_Full_Madrasah
+    Pay_Full_Madrasah --> KasMadrasah
+    Pay_Full_Madrasah --> Calc_Sisa[Hitung Sisa Dana]
+
+    %% PRIORITY 2: SPLIT SEKOLAH & PONDOK
+    subgraph Prio2 [Prioritas 2: Split Sekolah & Pondok]
+        Calc_Sisa --> Split[Bagi Sisa Dana 50:50]
+        Split --> Check_Sekolah{Bagian Sekolah > Sisa Tagihan?}
+        
+        %% Case: Sekolah Overflow (Dana Sekolah > Tagihan)
+        Check_Sekolah -->|"Ya: Ada Overflow"| Set_Overflow[Alokasi Sekolah = Tagihan\nOverflow dialihkan ke Pondok]
+        
+        %% Case: Sekolah Normal (Dana Sekolah <= Tagihan)
+        Check_Sekolah -->|"Tidak: Pas/Kurang"| Set_Normal[Alokasi Sekolah = 50%\nAlokasi Pondok = 50%]
+    end
+
+    %% Eksekusi Alokasi dari Prio 2 ke Kas
+    Set_Overflow -->|"Bayar Sekolah"| KasSekolah
+    Set_Overflow -->|"Dana Pondok + Overflow"| KasPondok
+
+    Set_Normal -->|"Bayar Sekolah"| KasSekolah
+    Set_Normal -->|"Bayar Pondok"| KasPondok
 ```
 
 ## Lokasi Input Pembayaran

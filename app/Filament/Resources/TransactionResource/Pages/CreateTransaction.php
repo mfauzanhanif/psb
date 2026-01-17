@@ -28,17 +28,40 @@ class CreateTransaction extends CreateRecord
             $this->halt();
         }
 
-        // Determine payment location based on user role
-        $isUnitUser = $user->hasRole('Bendahara Unit') && $user->institution_id;
-        $paymentLocation = $isUnitUser ? 'UNIT' : 'PANITIA';
+        // Determine payment location based on user role and institution type
+        $paymentLocation = 'PANITIA'; // Default for Admin, Petugas, Bendahara Pondok
+        $targetInstitutionId = null;
+        $isUnitPayment = false;
+
+        if ($user->hasRole('Bendahara Unit') && $user->institution_id) {
+            $institution = $user->institution;
+            if ($institution) {
+                // Set specific payment location based on institution type
+                $paymentLocation = match ($institution->type) {
+                    'madrasah' => 'MADRASAH',
+                    'smp', 'ma' => 'SEKOLAH',
+                    default => 'UNIT',
+                };
+                $targetInstitutionId = $institution->id;
+                $isUnitPayment = true;
+            }
+        }
 
         // Get the student's unpaid bills
         $student = Student::with('bills.institution')->find($studentId);
         $unpaidBills = $student->bills->where('remaining_amount', '>', 0)->sortBy('id');
 
-        if ($unpaidBills->isEmpty()) {
+        // For UNIT payments, only target the unit's own bill
+        $billsToProcess = $isUnitPayment && $targetInstitutionId
+            ? $unpaidBills->where('institution_id', $targetInstitutionId)
+            : $unpaidBills;
+
+        if ($billsToProcess->isEmpty()) {
+            $message = $isUnitPayment
+                ? 'Tidak ada tagihan untuk lembaga ini yang perlu dibayar'
+                : 'Tidak ada tagihan yang perlu dibayar';
             Notification::make()
-                ->title('Tidak ada tagihan yang perlu dibayar')
+                ->title($message)
                 ->danger()
                 ->send();
             $this->halt();
@@ -62,11 +85,11 @@ class CreateTransaction extends CreateRecord
             'user_id' => $data['user_id'],
             'verification_token' => $verificationToken,
             'payment_location' => $paymentLocation,
-            'is_settled' => $isUnitUser, // UNIT payments are immediately settled
+            'is_settled' => $isUnitPayment, // UNIT payments are immediately settled
         ]);
 
-        // Distribute payment across bills (FIFO)
-        foreach ($unpaidBills as $bill) {
+        // Distribute payment across bills
+        foreach ($billsToProcess as $bill) {
             if ($amountToPay <= 0) break;
 
             $payForThisBill = min($amountToPay, (float) $bill->remaining_amount);
@@ -76,9 +99,9 @@ class CreateTransaction extends CreateRecord
             $totalPaid += $payForThisBill;
 
             // For UNIT payments, auto-create COMPLETED FundTransfer
-            if ($isUnitUser) {
+            if ($isUnitPayment) {
                 $transfer = FundTransfer::create([
-                    'institution_id' => $user->institution_id,
+                    'institution_id' => $bill->institution_id, // Use bill's institution, not user's
                     'student_id' => $studentId,
                     'bill_id' => $bill->id,
                     'transaction_id' => $transaction->id,
@@ -98,10 +121,11 @@ class CreateTransaction extends CreateRecord
         }
 
         // Show appropriate notification based on location
-        if ($paymentLocation === 'UNIT') {
+        $institutionName = $user->institution?->name ?? 'Unit';
+        if ($isUnitPayment) {
             Notification::make()
                 ->title('Pembayaran berhasil dicatat')
-                ->body('Dana tercatat langsung di kas Unit.')
+                ->body("Dana tercatat langsung di kas {$institutionName}.")
                 ->success()
                 ->send();
         } else {
