@@ -99,8 +99,6 @@ Dokumentasi teknis lengkap tersedia di folder `docs/`:
 
 **Private/Proprietary** - Pondok Pesantren Dar Al Tauhid
 
-Hak cipta dilindungi. Dilarang menyalin, mendistribusikan, atau memodifikasi tanpa izin tertulis.
-
 ---
 
 *Built with ❤️ using Laravel, Filament, and Livewire*
